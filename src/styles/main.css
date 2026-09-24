@@ -8992,12 +8992,19 @@ body.appearance-open #top-strip.strip--dim {
 
 .customize-track-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 10px;
-  border-radius: 6px;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 10px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.customize-track-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .customize-track-title {
@@ -9014,4 +9021,41 @@ body.appearance-open #top-strip.strip--dim {
   font-size: 10px;
   color: var(--text-muted, #94a3b8);
   margin-left: 6px;
+}
+
+.customize-track-palette-row {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.customize-bg-total-palette {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 5px;
+  padding: 6px 2px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.customize-bg-swatch {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+}
+
+.customize-bg-swatch:hover {
+  transform: scale(1.18);
+  border-color: #ffffff;
+  z-index: 2;
+}
+
+.customize-bg-swatch--active {
+  outline: 2px solid #ffffff;
+  outline-offset: 1px;
 }

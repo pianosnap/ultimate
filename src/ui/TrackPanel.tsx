@@ -52,14 +52,14 @@ function TrackPanelView(props: PanelProps) {
               innerHTML={icons.sparkles(12)}
               style={{ display: 'inline-flex', 'vertical-align': 'middle', 'margin-right': '4px' }}
             />
-            {t('tracks.ledGlow') || 'Luminosità LED & Glow'}
+            {t('tracks.ledGlow') || 'Luminosità Glow'}
           </span>
           <span class="panel-led-val">{Math.round(props.ledGlow() * 100)}%</span>
         </div>
         <input
           type="range"
           min="0"
-          max="2.5"
+          max="2.0"
           step="0.05"
           class="mini-slider led-glow-slider"
           value={props.ledGlow()}
@@ -86,6 +86,13 @@ function TrackPanelView(props: PanelProps) {
                     value={color()}
                     aria-label={`Colore per ${tr.name}`}
                     onInput={(e) => {
+                      e.stopPropagation()
+                      const hex = e.currentTarget.value
+                      const num = parseInt(hex.slice(1), 16)
+                      tr.customColor = num
+                      props.onTrackColorChange(tr.id, num)
+                    }}
+                    onChange={(e) => {
                       e.stopPropagation()
                       const hex = e.currentTarget.value
                       const num = parseInt(hex.slice(1), 16)

@@ -99,6 +99,7 @@ export class PianoRollRenderer {
   private loopNoteStore: LiveNoteStore | null = null
   private visibleTrackIds = new Set<string>()
   private practiceFocusTrackIds: Set<string> | null = null
+  private customTrackColors = new Map<string, number>()
   private theme: Theme = darkTheme
   private pixelsPerSecond = DEFAULT_PIXELS_PER_SECOND
   private keyboardHeight = DEFAULT_KEYBOARD_HEIGHT
@@ -423,12 +424,18 @@ export class PianoRollRenderer {
 
   loadMidi(midi: MidiFile): void {
     this.midi = midi
+    for (const track of midi.tracks) {
+      if (this.customTrackColors.has(track.id)) {
+        track.customColor = this.customTrackColors.get(track.id)
+      }
+    }
     this.visibleTrackIds = new Set(midi.tracks.map((t) => t.id))
     this.practiceFocusTrackIds = null
     this.noteRenderer.setTracks(midi.tracks)
     this.particles.clear()
     this.prevActive.clear()
     this.currActive.clear()
+    this.keyboardRenderer.markDirty()
     this.renderStaticFrame(0)
   }
 
@@ -623,6 +630,13 @@ export class PianoRollRenderer {
     this.renderStaticFrame(this.lastRenderTime)
   }
 
+  private getLiveColor(): number {
+    if (this.midi && this.midi.tracks.length > 0) {
+      return getTrackColor(this.midi.tracks[0]!, this.theme)
+    }
+    return liveNoteColor(this.theme)
+  }
+
   private renderFrame(currentTime: number, dt: number, emitParticles: boolean): void {
     this.lastRenderTime = currentTime
     const curr = this.currActive
@@ -728,7 +742,7 @@ export class PianoRollRenderer {
 
       const held = this.liveNoteStore.heldNotes
       const loopHeld = this.loopNoteStore?.heldNotes
-      const liveColor = liveNoteColor(this.theme)
+      const liveColor = this.getLiveColor()
       const nowLineY = this.viewport.nowLineY
 
       for (const [pitch] of held) {
@@ -1026,14 +1040,17 @@ export class PianoRollRenderer {
   }
 
   setTrackColor(trackId: string, color: number): void {
+    this.customTrackColors.set(trackId, color)
     if (this.midi) {
       const track = this.midi.tracks.find((t) => t.id === trackId)
       if (track) {
         track.customColor = color
         this.noteRenderer.setTracks(this.midi.tracks)
-        this.presentFrame()
       }
     }
+    this.keyboardRenderer.markDirty()
+    this.wake()
+    this.presentFrame()
   }
 
   destroy(): void {

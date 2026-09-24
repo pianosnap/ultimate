@@ -188,30 +188,6 @@ export class NoteRenderer {
         } else {
           g.roundRect(x, y, w, h, noteRadius)
           g.fill({ color: noteColor, alpha })
-
-          // Internal LED core illumination inside the note bar
-          if (this.ledGlow > 0.05 && w >= 3 && h >= 4) {
-            const led = Math.min(this.ledGlow, 2.5)
-            const spineW = Math.max(1, Math.round(w * 0.44))
-            const spineX = x + Math.round((w - spineW) / 2)
-            const spineY = y + 2
-            const spineH = Math.max(1, h - 4)
-            const spineRadius = Math.max(1, noteRadius - 2)
-
-            // Inner translucent LED core
-            g.roundRect(spineX, spineY, spineW, spineH, spineRadius)
-            g.fill({ color: 0xffffff, alpha: alpha * 0.28 * led })
-            g.roundRect(spineX, spineY, spineW, spineH, spineRadius)
-            g.fill({ color: noteColor, alpha: alpha * 0.38 * led })
-
-            // Center high-intensity diode filament for wider bars
-            if (spineW >= 3 && spineH >= 6) {
-              const beamW = Math.max(1, Math.min(2, Math.round(w * 0.16)))
-              const beamX = x + Math.round((w - beamW) / 2)
-              g.rect(beamX, spineY + 2, beamW, Math.max(1, spineH - 4))
-              g.fill({ color: 0xffffff, alpha: alpha * 0.48 * led })
-            }
-          }
         }
 
         labels?.place(note.pitch, x, w, noteBottom, h, noteColor, alpha)
@@ -222,17 +198,8 @@ export class NoteRenderer {
           note.time <= currentTime &&
           note.time + note.duration >= currentTime
         ) {
-          const led = Math.min(this.ledGlow, 2.5)
           this.glowGraphics.roundRect(x, y, w, h, noteRadius)
-          this.glowGraphics.fill({ color: noteColor, alpha: 0.9 })
-
-          // Intense internal LED hot spot at the contact edge where the note strikes the key
-          if (led > 0.05) {
-            const hotH = Math.min(8, h)
-            const hotY = Math.max(y, nowLineY - hotH)
-            this.glowGraphics.roundRect(x + 1, hotY, Math.max(1, w - 2), hotH, 2)
-            this.glowGraphics.fill({ color: 0xffffff, alpha: 0.65 * led })
-          }
+          this.glowGraphics.fill({ color: noteColor, alpha: 0.85 })
 
           sumR += colorR
           sumG += colorG

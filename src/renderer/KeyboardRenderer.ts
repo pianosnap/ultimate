@@ -471,7 +471,6 @@ export class KeyboardRenderer {
     const { keyboardHeight } = viewport.config
     const positions = viewport.getAllKeyPositions()
     const fallback = liveNoteColor(this.theme)
-    const led = this.ledGlow
 
     for (const [pitch, color] of activeByPitch) {
       const pos = positions.get(pitch)
@@ -481,48 +480,26 @@ export class KeyboardRenderer {
       const layer = isBlack ? this.blackActiveLayer : this.whiteActiveLayer
       const { x, y, w, h, radius } = keyRect(pitch, pos, keyboardHeight)
 
-      // ── Internal LED Illumination ──
-      // 1. Subtle translucent edge scatter (tight 1px, not blurry 10px outer halo)
-      if (led > 0.1) {
-        layer.roundRect(x - 1, y - 1, w + 2, h + 2, radius + 1)
-        layer.fill({ color: tint, alpha: 0.18 * Math.min(led, 2.0) })
-      }
-
-      // 2. Base illuminated acrylic key body
+      // Solid, rich track color illumination on pressed keys without white center lines or white glare
       layer.roundRect(x, y, w, h, radius)
       layer.fill({
         color: tint,
-        alpha: Math.min(1.0, (isBlack ? 0.9 : 0.78) + 0.18 * Math.min(led, 2.0)),
+        alpha: isBlack ? 0.95 : 0.88,
       })
 
-      // 3. Inner LED Lightguide Core (illuminated from the inside)
-      if (led > 0.05) {
-        const coreW = Math.max(3, Math.round(w * 0.58))
-        const coreX = x + Math.round((w - coreW) / 2)
-        const coreY = y + 5
-        const coreH = Math.max(4, h - (isBlack ? 9 : 14))
+      // Subtle top depth shadow (fallboard occlusion)
+      layer.rect(x, y, w, 2).fill({ color: 0x000000, alpha: 0.18 })
 
-        // Inner glowing core
-        layer.roundRect(coreX, coreY, coreW, coreH, 2)
-        layer.fill({ color: 0xffffff, alpha: 0.3 * Math.min(led, 2.0) })
-        layer.roundRect(coreX, coreY, coreW, coreH, 2)
-        layer.fill({ color: tint, alpha: 0.45 * Math.min(led, 2.0) })
-
-        // 4. Center high-intensity LED diode filament
-        const beamW = Math.max(1, Math.min(2, Math.round(w * 0.18)))
-        const beamX = x + Math.round((w - beamW) / 2)
-        layer.rect(beamX, coreY + 3, beamW, Math.max(2, coreH - 6))
-        layer.fill({ color: 0xffffff, alpha: 0.65 * Math.min(led, 2.0) })
-
-        // 5. Specular LED inner rim reflection
-        layer
-          .rect(x + 2, y + 2, w - 4, 1.5)
-          .fill({ color: 0xffffff, alpha: 0.55 * Math.min(led, 2.0) })
-        layer
-          .rect(x + 2, y + h - (isBlack ? 5 : 13), w - 4, 1.5)
-          .fill({ color: 0xffffff, alpha: 0.4 * Math.min(led, 2.0) })
-      }
+      // Subtle bottom chamfer matching key color
+      layer
+        .rect(x + 1, y + h - (isBlack ? 3 : 5), w - 2, 2)
+        .fill({ color: tint, alpha: 0.7 })
     }
+  }
+
+  markDirty(): void {
+    this.activeLayerDirty = true
+    this.lastSignature = ''
   }
 
   updateTheme(theme: Theme): void {

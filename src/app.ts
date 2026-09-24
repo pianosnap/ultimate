@@ -486,6 +486,13 @@ export class App {
     )
     this.trackPanel.setTrigger(this.controls.tracksButton)
     this.trackPanel.onSetLedGlow = (val) => this.setLedGlow(val)
+    this.trackPanel.onTrackColorChange = (trackId, color) => {
+      this.store.setTrackColor(trackId, color)
+      this.renderer.setTrackColor(trackId, color)
+      if (this.store.state.loadedMidi) {
+        this.customizeMenu.setTracks(this.store.state.loadedMidi.tracks)
+      }
+    }
 
     this.instrumentMenu = new InstrumentMenu(this.controls.instrumentSlot, overlay)
     this.instrumentMenu.onSelect = (id) => this.setInstrumentById(id)

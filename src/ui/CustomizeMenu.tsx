@@ -112,6 +112,49 @@ interface MenuProps {
   registerEl: (el: HTMLElement) => void
 }
 
+const TOTAL_BG_PALETTE = [
+  // 1. Toni Notturni & Scuri
+  { hex: '#000000', name: 'Nero Assoluto' },
+  { hex: '#050510', name: 'Mezzanotte' },
+  { hex: '#09090f', name: 'Notte Fondente' },
+  { hex: '#0c0e14', name: 'Grafite' },
+  { hex: '#060f1e', name: 'Blu Notte' },
+  { hex: '#03171f', name: 'Abisso' },
+  { hex: '#041d14', name: 'Smeraldo Scuro' },
+  { hex: '#190a24', name: 'Viola Notturno' },
+  { hex: '#1c050f', name: 'Bordeaux Scuro' },
+  // 2. Toni Ardesia & Desaturati
+  { hex: '#18181b', name: 'Zinco Scuro' },
+  { hex: '#1e293b', name: 'Ardesia' },
+  { hex: '#172554', name: 'Cobalto' },
+  { hex: '#1e1b4b', name: 'Indaco Scuro' },
+  { hex: '#2e1065', name: 'Ametista Profonda' },
+  { hex: '#3b0724', name: 'Prugna Scuro' },
+  { hex: '#022c22', name: 'Verde Pino' },
+  { hex: '#083344', name: 'Petrolio Notturno' },
+  { hex: '#1c1917', name: 'Pietra Calda' },
+  // 3. Toni Ricchi & Vibranti
+  { hex: '#dc2626', name: 'Rosso Carminio' },
+  { hex: '#ea580c', name: 'Arancio Tramonto' },
+  { hex: '#d97706', name: 'Ambra Calda' },
+  { hex: '#16a34a', name: 'Verde Bosco' },
+  { hex: '#0891b2', name: 'Ciano Intenso' },
+  { hex: '#2563eb', name: 'Blu Reale' },
+  { hex: '#4f46e5', name: 'Indaco Elettrico' },
+  { hex: '#7c3aed', name: 'Viola Vivace' },
+  { hex: '#db2777', name: 'Magenta Brillante' },
+  // 4. Toni Pastello & Chiaroscuri
+  { hex: '#334155', name: 'Ardesia Media' },
+  { hex: '#475569', name: 'Grigio Tempesta' },
+  { hex: '#64748b', name: 'Peltro' },
+  { hex: '#94a3b8', name: 'Nebbia' },
+  { hex: '#cbd5e1', name: 'Perla' },
+  { hex: '#e2e8f0', name: 'Platino Chiaro' },
+  { hex: '#f8fafc', name: 'Ghiaccio Candido' },
+  { hex: '#fef3c7', name: 'Avorio Caldo' },
+  { hex: '#ffffff', name: 'Bianco Assoluto' },
+]
+
 function MenuView(props: MenuProps) {
   return (
     <div
@@ -227,7 +270,7 @@ function MenuView(props: MenuProps) {
             <span class="customize-section-label">
               <span style={{ display: 'inline-flex', 'align-items': 'center', gap: '6px' }}>
                 <span innerHTML={icons.sparkles(14)} />
-                {t('customize.ledGlow') || 'Luminosità LED & Glow'}
+                {t('customize.ledGlow') || 'Luminosità Glow'}
               </span>
             </span>
             <span class="customize-section-value">{Math.round((props.ledGlow() ?? 1) * 100)}%</span>
@@ -236,7 +279,7 @@ function MenuView(props: MenuProps) {
             <input
               type="range"
               min="0"
-              max="2.5"
+              max="2.0"
               step="0.05"
               class="mini-slider led-glow-slider"
               value={props.ledGlow() ?? 1}
@@ -246,28 +289,29 @@ function MenuView(props: MenuProps) {
               }}
             />
             <div class="customize-slider-hint">
-              <span>0% (Spento)</span>
-              <span class="led-badge">Glow & Barre 3D</span>
-              <span>250%</span>
+              <span>0% (Disattivato)</span>
+              <span>200% (Massimo)</span>
             </div>
           </div>
         </div>
 
-        {/* ─── Sfondo Personalizzato (Colore o Immagine) ─── */}
+        {/* ─── Sfondo Personalizzato (Paletta Totale Colori & Immagine) ─── */}
         <div class="customize-section">
           <div class="customize-section-head">
-            <span class="customize-section-label">Sfondo (Colore o Immagine)</span>
+            <span class="customize-section-label">Sfondo (Paletta Colori & Immagine)</span>
             <span class="customize-section-value">
               {props.customBgImage() ? 'Immagine' : props.customBgColor() || 'Predefinito'}
             </span>
           </div>
-          <div class="customize-color-row">
+          <div class="customize-color-row" style={{ 'margin-bottom': '8px' }}>
             {/* Color picker */}
-            <div class="customize-color-picker-wrap" title="Scegli qualsiasi colore di sfondo">
+            <div class="customize-color-picker-wrap" title="Scegli qualsiasi colore con selettore (RGB / Contagocce)">
               <div
                 class="customize-color-swatch-box"
                 style={{
                   background: props.customBgColor() || '#000000',
+                  width: '32px',
+                  height: '32px',
                 }}
               />
               <input
@@ -277,59 +321,48 @@ function MenuView(props: MenuProps) {
                 onInput={(e) => {
                   props.onSetCustomBgColor?.(e.currentTarget.value)
                 }}
+                onChange={(e) => {
+                  props.onSetCustomBgColor?.(e.currentTarget.value)
+                }}
               />
             </div>
 
-            {/* Quick swatches */}
-            <div class="customize-preset-chips">
-              <button
-                type="button"
-                class="customize-color-dot"
-                style={{ background: '#000000' }}
-                title="Nero profondo"
-                onClick={() => props.onSetCustomBgColor?.('#000000')}
-              />
-              <button
-                type="button"
-                class="customize-color-dot"
-                style={{ background: '#09090f' }}
-                title="Notte scura"
-                onClick={() => props.onSetCustomBgColor?.('#09090f')}
-              />
-              <button
-                type="button"
-                class="customize-color-dot"
-                style={{ background: '#0a1128' }}
-                title="Blu zaffiro"
-                onClick={() => props.onSetCustomBgColor?.('#0a1128')}
-              />
-              <button
-                type="button"
-                class="customize-color-dot"
-                style={{ background: '#1c0d24' }}
-                title="Viola scuro"
-                onClick={() => props.onSetCustomBgColor?.('#1c0d24')}
-              />
-              <button
-                type="button"
-                class="customize-color-dot"
-                style={{ background: '#0d1e18' }}
-                title="Smeraldo scuro"
-                onClick={() => props.onSetCustomBgColor?.('#0d1e18')}
-              />
-            </div>
+            <span style={{ 'font-size': '11px', color: 'var(--text-muted, #94a3b8)' }}>
+              {props.customBgColor() || 'Colore tema'}
+            </span>
 
             {/* Reset button */}
-            <button
-              type="button"
-              class="customize-btn-sm"
-              onClick={() => {
-                props.onSetCustomBgColor?.(null)
-                props.onSetCustomBgImage?.(null)
+            <div style={{ 'margin-left': 'auto' }}>
+              <button
+                type="button"
+                class="customize-btn-sm"
+                onClick={() => {
+                  props.onSetCustomBgColor?.(null)
+                  props.onSetCustomBgImage?.(null)
+                }}
+              >
+                Ripristina
+              </button>
+            </div>
+          </div>
+
+          {/* Paletta Totale dei Colori Possibili */}
+          <div class="customize-bg-total-palette" title="Tavolozza completa colori per sfondo">
+            <For each={TOTAL_BG_PALETTE}>
+              {(c) => {
+                const isActive = () => (props.customBgColor() || '').toLowerCase() === c.hex.toLowerCase()
+                return (
+                  <button
+                    type="button"
+                    class="customize-bg-swatch"
+                    classList={{ 'customize-bg-swatch--active': isActive() }}
+                    style={{ background: c.hex }}
+                    title={`${c.name} (${c.hex})`}
+                    onClick={() => props.onSetCustomBgColor?.(c.hex)}
+                  />
+                )
               }}
-            >
-              Ripristina
-            </button>
+            </For>
           </div>
 
           {/* Background Image Upload */}
@@ -476,44 +509,74 @@ function MenuView(props: MenuProps) {
           </button>
         </div>
 
-        {/* ─── Colori Tracce Personalizzati ─── */}
+        {/* ─── Colori Tracce & Barre Personalizzati ─── */}
         <Show when={props.tracks() && props.tracks().length > 0}>
           <div class="customize-section">
             <div class="customize-section-head">
-              <span class="customize-section-label">Colori Tracce</span>
+              <span class="customize-section-label">Colori Tracce & Barre</span>
               <span class="customize-section-value">{props.tracks().length} tracce</span>
             </div>
             <div class="customize-track-list">
               <For each={props.tracks()}>
                 {(track, idx) => {
-                  const defaultColorHex = hexToCSS(getTrackColor(track, props.themes[props.themeIndex()] || props.themes[0]!))
-                  const effectiveColorHex = track.customColor ? hexToCSS(track.customColor) : defaultColorHex
+                  const defaultColorHex = () =>
+                    hexToCSS(getTrackColor(track, props.themes[props.themeIndex()] || props.themes[0]!))
+                  const effectiveColorHex = () =>
+                    track.customColor !== undefined ? hexToCSS(track.customColor) : defaultColorHex()
+
+                  const handleColorChange = (hex: string) => {
+                    const intVal = parseInt(hex.replace('#', ''), 16)
+                    track.customColor = intVal
+                    props.onTrackColorChange?.(track.id, intVal)
+                  }
+
+                  const TRACK_SWATCHES = [
+                    '#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#a855f7', '#ffffff'
+                  ]
+
                   return (
                     <div class="customize-track-item">
-                      <div class="customize-track-title" title={track.name || `Traccia ${idx() + 1}`}>
-                        {track.name || `Traccia ${idx() + 1}`}
-                        <span class="customize-track-count">({track.notes.length} note)</span>
+                      <div class="customize-track-header">
+                        <div class="customize-track-title" title={track.name || `Traccia ${idx() + 1}`}>
+                          {track.name || `Traccia ${idx() + 1}`}
+                          <span class="customize-track-count">({track.notes.length} note)</span>
+                        </div>
+                        <div class="customize-color-picker-wrap" title="Scegli qualsiasi colore con selettore">
+                          <div
+                            class="customize-color-swatch-box"
+                            style={{
+                              width: '26px',
+                              height: '26px',
+                              'border-radius': '6px',
+                              background: effectiveColorHex(),
+                            }}
+                          />
+                          <input
+                            type="color"
+                            class="customize-color-input-hidden"
+                            value={effectiveColorHex()}
+                            onInput={(e) => handleColorChange(e.currentTarget.value)}
+                            onChange={(e) => handleColorChange(e.currentTarget.value)}
+                          />
+                        </div>
                       </div>
-                      <div class="customize-color-picker-wrap">
-                        <div
-                          class="customize-color-swatch-box"
-                          style={{
-                            width: '26px',
-                            height: '26px',
-                            'border-radius': '6px',
-                            background: effectiveColorHex,
-                          }}
-                        />
-                        <input
-                          type="color"
-                          class="customize-color-input-hidden"
-                          value={effectiveColorHex}
-                          onInput={(e) => {
-                            const hex = e.currentTarget.value
-                            const intVal = parseInt(hex.slice(1), 16)
-                            props.onTrackColorChange?.(track.id, intVal)
-                          }}
-                        />
+                      <div class="customize-track-palette-row">
+                        <For each={TRACK_SWATCHES}>
+                          {(swatchHex) => (
+                            <button
+                              type="button"
+                              class="customize-color-dot"
+                              style={{
+                                background: swatchHex,
+                                width: '20px',
+                                height: '20px',
+                                'outline': effectiveColorHex().toLowerCase() === swatchHex.toLowerCase() ? '2px solid #ffffff' : 'none'
+                              }}
+                              title={swatchHex}
+                              onClick={() => handleColorChange(swatchHex)}
+                            />
+                          )}
+                        </For>
                       </div>
                     </div>
                   )
@@ -855,7 +918,7 @@ export class CustomizeMenu {
   }
 
   setTracks(tracks: readonly MidiTrack[]): void {
-    this.setTracksSig(tracks)
+    this.setTracksSig([...tracks])
   }
 
   setTheme(index: number): void {
